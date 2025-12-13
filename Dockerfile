@@ -1,8 +1,8 @@
 # ==========================
 # ===== Build Stage =======
 # ==========================
-# Use Maven + Temurin JDK 17 to compile and package the app
-FROM maven:3.9.2-eclipse-temurin-17 AS build
+# Use Maven + Temurin JDK 21 to compile the app
+FROM maven:3.9.2-eclipse-temurin-21 AS build
 
 # Set working directory inside the container
 WORKDIR /app
