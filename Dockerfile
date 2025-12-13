@@ -2,7 +2,7 @@
 # ===== Build Stage =======
 # ==========================
 # Use Maven + Temurin JDK 21 to compile the app
-FROM maven:3.9.2-eclipse-temurin-21 AS build
+FROM maven:3.9.2-temurin-21 AS build
 
 # Set working directory inside the container
 WORKDIR /app
@@ -22,8 +22,8 @@ RUN mvn clean package -DskipTests
 # ==========================
 # ===== Runtime Stage =====
 # ==========================
-# Use lightweight Temurin JRE 17 for runtime (smaller image than full JDK)
-FROM eclipse-temurin:17-jre
+# Use lightweight Temurin JRE 21 for runtime (smaller image than full JDK)
+FROM eclipse-temurin:21-jre
 
 # Set working directory for the runtime container
 WORKDIR /app
