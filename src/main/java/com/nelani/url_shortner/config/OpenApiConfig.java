@@ -32,7 +32,7 @@ public class OpenApiConfig {
                                                                 .url("http://localhost:8080")
                                                                 .description("Local Development Server"),
                                                 new Server()
-                                                                .url("Not Hosted Yet")
+                                                                .url("https://url-shortener-4yxt.onrender.com")
                                                                 .description("Production Server")))
                                 .components(new Components());
         }

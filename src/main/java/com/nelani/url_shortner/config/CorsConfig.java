@@ -16,7 +16,8 @@ public class CorsConfig {
 
                 // Allowed origins
                 corsConfiguration.setAllowedOrigins(List.of(
-                                "http://localhost:8080"));
+                                "http://localhost:8080",
+                                "https://url-shortener-4yxt.onrender.com"));
 
                 // Allowed HTTP methods
                 corsConfiguration.setAllowedMethods(List.of(
