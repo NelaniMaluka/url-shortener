@@ -38,10 +38,6 @@ public class ShortUrl {
 
     private LocalDateTime updatedAt;
 
-    @Builder.Default
-    @Min(value = 0, message = "Clicks cannot be negative")
-    private long clicks = 0;
-
     @PreUpdate
     public void onUpdate() {
         this.updatedAt = LocalDateTime.now();

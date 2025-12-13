@@ -3,6 +3,7 @@ package com.nelani.url_shortner.service.impl;
 import com.nelani.url_shortner.dto.UpdateUrlDTO;
 import com.nelani.url_shortner.mapper.UrlResponseMapper;
 import com.nelani.url_shortner.model.ShortUrl;
+import com.nelani.url_shortner.repository.RequestDataRepository;
 import com.nelani.url_shortner.repository.ShortUrlRepository;
 import com.nelani.url_shortner.response.UrlResponse;
 import com.nelani.url_shortner.service.UrlService;
@@ -17,9 +18,11 @@ import org.springframework.web.server.ResponseStatusException;
 public class UrlServiceImpl implements UrlService {
 
     private final ShortUrlRepository urlRepository;
+    private final RequestDataRepository requestDataRepository;
 
-    public UrlServiceImpl(ShortUrlRepository urlRepository) {
+    public UrlServiceImpl(ShortUrlRepository urlRepository, RequestDataRepository requestDataRepository) {
         this.urlRepository = urlRepository;
+        this.requestDataRepository = requestDataRepository;
     }
 
     @Override
@@ -29,7 +32,7 @@ public class UrlServiceImpl implements UrlService {
         var urls = urlRepository.findAll(pageable);
 
         // Return the page with urls mapped to the dto
-        return urls.map(UrlResponseMapper::toDto);
+        return urls.map(shortUrl -> UrlResponseMapper.toDto(shortUrl, requestDataRepository));
     }
 
     @Override
@@ -56,8 +59,10 @@ public class UrlServiceImpl implements UrlService {
                 .build();
         urlRepository.save(shortUrl);
 
+        int clicks = requestDataRepository.countByShortUrl(shortUrl);
+
         // Return the url mapped to the dto
-        return UrlResponseMapper.toDto(shortUrl);
+        return UrlResponseMapper.toDto(shortUrl, clicks);
     }
 
     @Override
@@ -83,8 +88,10 @@ public class UrlServiceImpl implements UrlService {
         shortUrl.setOriginalUrl(newUrl);
         urlRepository.save(shortUrl);
 
+        int clicks = requestDataRepository.countByShortUrl(shortUrl);
+
         // Return the url mapped to the dto
-        return UrlResponseMapper.toDto(shortUrl);
+        return UrlResponseMapper.toDto(shortUrl, clicks);
     }
 
     @Override
