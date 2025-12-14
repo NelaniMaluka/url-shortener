@@ -12,7 +12,7 @@ import java.security.SecureRandom;
 public class UrlShortenerAlgorithm {
 
     private static final String BASE62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    private static final String HOSTURL = "http://localhost:8080/";
+    private static final String HOSTURL = "https://url-shortener-4yxt.onrender.com";
     private static final SecureRandom RANDOM = new SecureRandom();
 
     public static String encode(String url) {

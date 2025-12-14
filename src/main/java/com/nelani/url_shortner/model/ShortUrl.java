@@ -38,6 +38,9 @@ public class ShortUrl {
 
     private LocalDateTime updatedAt;
 
+    @Column(nullable = true)
+    private LocalDateTime expiresAt;
+
     @PreUpdate
     public void onUpdate() {
         this.updatedAt = LocalDateTime.now();

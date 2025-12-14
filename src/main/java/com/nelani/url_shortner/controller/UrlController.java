@@ -1,5 +1,6 @@
 package com.nelani.url_shortner.controller;
 
+import com.nelani.url_shortner.dto.CreateUrlDTO;
 import com.nelani.url_shortner.dto.UpdateUrlDTO;
 import com.nelani.url_shortner.response.UrlResponse;
 import com.nelani.url_shortner.service.UrlService;
@@ -41,8 +42,8 @@ public class UrlController {
         @PostMapping("/urls")
         @RateLimiter(name = "shortenRateLimiter")
         public ResponseEntity<?> addUrl(
-                        @Parameter(description = "URL to shorten") @RequestBody String url) {
-                UrlResponse response = urlService.createShortUrl(url);
+                        @RequestBody CreateUrlDTO dto) {
+                UrlResponse response = urlService.createShortUrl(dto);
                 return ResponseEntity.ok(response);
         }
 

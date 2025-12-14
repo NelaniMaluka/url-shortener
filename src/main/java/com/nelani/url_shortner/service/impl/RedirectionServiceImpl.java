@@ -6,7 +6,10 @@ import com.nelani.url_shortner.service.RedirectionService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.time.LocalDateTime;
 
 @Service
 public class RedirectionServiceImpl implements RedirectionService {
@@ -19,10 +22,17 @@ public class RedirectionServiceImpl implements RedirectionService {
         this.analyticsService = analyticsService;
     }
 
+    @Override
+    @Transactional
     public String redirect(String shortCode, HttpServletRequest req) {
         // Get the url
         ShortUrl shortUrl = urlRepository.findByShortCode(shortCode)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Url does not exist."));
+
+        // Check if the url is expired
+        if (shortUrl.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.GONE, "Short URL has expired.");
+        }
 
         // Log analytics asynchronously, any failure here does NOT block redirect
         analyticsService.logRequestAsync(shortUrl, req);

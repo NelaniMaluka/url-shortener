@@ -14,6 +14,7 @@ public class UrlResponseMapper {
                 UrlShortenerAlgorithm.buildUrl(shortUrl.getShortCode()),
                 shortUrl.getCreatedAt(),
                 shortUrl.getUpdatedAt(),
+                shortUrl.getExpiresAt(),
                 clicks);
     }
 

@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Log4j2
 @Service
@@ -29,6 +30,7 @@ public class AnalyticsService {
      * block the user request flow.
      */
     @Async
+    @Transactional
     public void logRequestAsync(ShortUrl shortUrl, HttpServletRequest req) {
         String ip = req.getRemoteAddr();
 

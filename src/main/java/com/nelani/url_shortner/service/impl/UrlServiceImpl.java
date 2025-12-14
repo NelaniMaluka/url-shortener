@@ -1,5 +1,6 @@
 package com.nelani.url_shortner.service.impl;
 
+import com.nelani.url_shortner.dto.CreateUrlDTO;
 import com.nelani.url_shortner.dto.UpdateUrlDTO;
 import com.nelani.url_shortner.mapper.UrlResponseMapper;
 import com.nelani.url_shortner.model.ShortUrl;
@@ -12,7 +13,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.time.LocalDateTime;
 
 @Service
 public class UrlServiceImpl implements UrlService {
@@ -26,6 +30,7 @@ public class UrlServiceImpl implements UrlService {
     }
 
     @Override
+    @Transactional
     public Page<UrlResponse> viewAllUrls(int page, int size) {
         // Generate and get the urls
         Pageable pageable = PageRequest.of(page, size);
@@ -36,9 +41,10 @@ public class UrlServiceImpl implements UrlService {
     }
 
     @Override
-    public UrlResponse createShortUrl(String url) {
+    @Transactional
+    public UrlResponse createShortUrl(CreateUrlDTO dto) {
         // validate url
-        url = UrlShortenerAlgorithm.validateUrl(url);
+        String url = UrlShortenerAlgorithm.validateUrl(dto.url());
 
         // Check if the url exists
         boolean exists = urlRepository.existsByOriginalUrl(url);
@@ -57,6 +63,10 @@ public class UrlServiceImpl implements UrlService {
                 .shortCode(shortCode)
                 .originalUrl(url)
                 .build();
+
+        // Set the expiration date
+        shortUrl.setExpiresAt(resolveExpiry(dto.expiresInDays()));
+
         urlRepository.save(shortUrl);
 
         int clicks = requestDataRepository.countByShortUrl(shortUrl);
@@ -66,6 +76,7 @@ public class UrlServiceImpl implements UrlService {
     }
 
     @Override
+    @Transactional
     public UrlResponse updateUrl(UpdateUrlDTO dto) {
         // validate urls
         String existingUrl = UrlShortenerAlgorithm.validateUrl(dto.shortUrl());
@@ -84,6 +95,9 @@ public class UrlServiceImpl implements UrlService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Url already exists.");
         }
 
+        // Set the expiration date
+        shortUrl.setExpiresAt(resolveExpiry(dto.expiresInDays()));
+
         // update the url entity with the new url while maintaining the old shortCode
         shortUrl.setOriginalUrl(newUrl);
         urlRepository.save(shortUrl);
@@ -95,6 +109,7 @@ public class UrlServiceImpl implements UrlService {
     }
 
     @Override
+    @Transactional
     public void deleteUrl(String existingUrl) {
         // validate url
         existingUrl = UrlShortenerAlgorithm.validateUrl(existingUrl);
@@ -108,5 +123,20 @@ public class UrlServiceImpl implements UrlService {
 
         // deletes the url from the database
         urlRepository.delete(shortUrl);
+    }
+
+    private LocalDateTime resolveExpiry(Integer days) {
+        if (days == null) {
+            return null; // never expires
+        }
+
+        return switch (days) {
+            case 1 -> LocalDateTime.now().plusDays(1);
+            case 7 -> LocalDateTime.now().plusDays(7);
+            case 15 -> LocalDateTime.now().plusDays(15);
+            case 30 -> LocalDateTime.now().plusDays(30);
+            default -> throw new IllegalArgumentException(
+                    "Invalid expiresInDays value. Allowed values: 1, 7, 15, 30");
+        };
     }
 }

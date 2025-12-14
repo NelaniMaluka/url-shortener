@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class RequestDataServiceImpl implements RequestDataService {
@@ -19,6 +20,7 @@ public class RequestDataServiceImpl implements RequestDataService {
     }
 
     @Override
+    @Transactional
     public Page<MostAccessedUrlResponse> getMostAccessedRequestData(int page, int size) {
         // Get the most accessed urls
         Pageable pageable = PageRequest.of(page, size);
