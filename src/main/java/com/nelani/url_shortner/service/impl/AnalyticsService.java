@@ -11,6 +11,11 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
+
 @Log4j2
 @Service
 public class AnalyticsService {
@@ -32,11 +37,12 @@ public class AnalyticsService {
     @Async
     @Transactional
     public void logRequestAsync(ShortUrl shortUrl, HttpServletRequest req) {
-        String ip = req.getRemoteAddr();
+        String ip = getClientIp(req);
+        String deviceHash = generateDeviceHash(ip, req.getHeader("User-Agent"), shortUrl.getId());
 
         RequestData data = RequestData.builder()
                 .shortUrl(shortUrl)
-                .ipAddress(ip)
+                .deviceHash(deviceHash)
                 .referrer(req.getHeader("Referer"))
                 .userAgent(req.getHeader("User-Agent"))
                 .build();
@@ -60,4 +66,33 @@ public class AnalyticsService {
                     shortUrl.getId(), ex.getMessage());
         }
     }
+
+    private String getClientIp(HttpServletRequest request) {
+        String forwarded = request.getHeader("X-Forwarded-For");
+        if (forwarded != null && !forwarded.isBlank()) {
+            return forwarded.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
+    }
+
+    private String generateDeviceHash(String ip, String userAgent, UUID shortUrlId) {
+        try {
+            String raw = ip + "|" + userAgent + "|" + shortUrlId;
+
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(raw.getBytes(StandardCharsets.UTF_8));
+
+            StringBuilder hex = new StringBuilder();
+            for (byte b : hash) {
+                hex.append(String.format("%02x", b));
+            }
+            return hex.toString();
+
+        } catch (NoSuchAlgorithmException e) {
+            // Fallback: log the error and generate a random UUID
+            System.err.println("Warning: Could not generate device hash, using fallback UUID. " + e.getMessage());
+            return UUID.randomUUID().toString().replace("-", "");
+        }
+    }
+
 }

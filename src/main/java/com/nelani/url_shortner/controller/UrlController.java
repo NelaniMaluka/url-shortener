@@ -2,17 +2,21 @@ package com.nelani.url_shortner.controller;
 
 import com.nelani.url_shortner.dto.CreateUrlDTO;
 import com.nelani.url_shortner.dto.UpdateUrlDTO;
+import com.nelani.url_shortner.response.BulkUrlResult;
 import com.nelani.url_shortner.response.UrlResponse;
 import com.nelani.url_shortner.service.UrlService;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Validated
 @RestController
@@ -37,19 +41,35 @@ public class UrlController {
                 return ResponseEntity.ok(urls);
         }
 
-        @Operation(summary = "Create a new shortened URL", description = "Takes a full URL and returns a shortened one.")
-        @ApiResponse(responseCode = "200", description = "Short URL created", content = @Content(schema = @Schema(implementation = UrlResponse.class)))
-        @PostMapping("/urls")
+        @Operation(summary = "Create shortened URLs in bulk")
+        @ApiResponse(responseCode = "200", description = "Short URLs created", content = @Content(array = @ArraySchema(schema = @Schema(implementation = BulkUrlResult.class))))
+        @PostMapping("/urls/add")
         @RateLimiter(name = "shortenRateLimiter")
-        public ResponseEntity<?> addUrl(
-                        @RequestBody CreateUrlDTO dto) {
-                UrlResponse response = urlService.createShortUrl(dto);
-                return ResponseEntity.ok(response);
+        public ResponseEntity<List<BulkUrlResult>> addUrlsBulk(
+                        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "List of URLs to shorten", required = true, content = @Content(array = @ArraySchema(schema = @Schema(implementation = CreateUrlDTO.class)))) @RequestBody List<CreateUrlDTO> urls) {
+
+                List<BulkUrlResult> results = urls.stream()
+                                .map(createUrlDTO -> {
+                                        try {
+                                                return new BulkUrlResult(
+                                                                createUrlDTO,
+                                                                urlService.createShortUrl(createUrlDTO),
+                                                                null);
+                                        } catch (Exception e) {
+                                                return new BulkUrlResult(
+                                                                createUrlDTO,
+                                                                null,
+                                                                e.getMessage());
+                                        }
+                                })
+                                .toList();
+
+                return ResponseEntity.ok(results);
         }
 
         @Operation(summary = "Update an existing shortened URL", description = "Replaces an existing URL mapping with a new URL.")
         @ApiResponse(responseCode = "200", description = "URL updated", content = @Content(schema = @Schema(implementation = UrlResponse.class)))
-        @PutMapping("/urls")
+        @PutMapping("/urls/update")
         @RateLimiter(name = "shortenRateLimiter")
         public ResponseEntity<?> updateUrl(
                         @Parameter(description = "New replacement URL") @RequestBody UpdateUrlDTO dto) {
@@ -59,7 +79,7 @@ public class UrlController {
 
         @Operation(summary = "Delete a shortened URL", description = "Deletes a URL mapping from the system.")
         @ApiResponse(responseCode = "200", description = "URL deleted")
-        @DeleteMapping("/urls")
+        @DeleteMapping("/urls/delete")
         @RateLimiter(name = "shortenRateLimiter")
         public ResponseEntity<?> removeUrl(
                         @Parameter(description = "URL to delete") @RequestBody String url) {

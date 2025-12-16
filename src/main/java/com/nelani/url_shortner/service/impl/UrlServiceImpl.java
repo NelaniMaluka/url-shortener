@@ -62,6 +62,7 @@ public class UrlServiceImpl implements UrlService {
         ShortUrl shortUrl = ShortUrl.builder()
                 .shortCode(shortCode)
                 .originalUrl(url)
+                .accessLimit(dto.accessLimit())
                 .build();
 
         // Set the expiration date
@@ -69,7 +70,7 @@ public class UrlServiceImpl implements UrlService {
 
         urlRepository.save(shortUrl);
 
-        int clicks = requestDataRepository.countByShortUrl(shortUrl);
+        Long clicks = requestDataRepository.countByShortUrl(shortUrl);
 
         // Return the url mapped to the dto
         return UrlResponseMapper.toDto(shortUrl, clicks);
@@ -95,14 +96,25 @@ public class UrlServiceImpl implements UrlService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Url already exists.");
         }
 
+        // Check if the new short code exists
+        if (dto.newShortKey() != null && !urlRepository.existsByShortCode(dto.newShortKey())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Short Key is already in use.");
+        }
+
+        // Set the new short code if it's not null
+        if (dto.newShortKey() != null) {
+            shortUrl.setShortCode(dto.newShortKey());
+        }
+
         // Set the expiration date
         shortUrl.setExpiresAt(resolveExpiry(dto.expiresInDays()));
+        shortUrl.setAccessLimit(dto.accessLimit());
 
         // update the url entity with the new url while maintaining the old shortCode
         shortUrl.setOriginalUrl(newUrl);
         urlRepository.save(shortUrl);
 
-        int clicks = requestDataRepository.countByShortUrl(shortUrl);
+        Long clicks = requestDataRepository.countByShortUrl(shortUrl);
 
         // Return the url mapped to the dto
         return UrlResponseMapper.toDto(shortUrl, clicks);

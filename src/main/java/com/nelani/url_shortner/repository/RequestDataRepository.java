@@ -7,12 +7,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.UUID;
 
 public interface RequestDataRepository extends JpaRepository<RequestData, UUID> {
 
-    int countByShortUrl(ShortUrl shortUrl);
+    long countByShortUrl(ShortUrl shortUrl);
+
+    @Query("SELECT COUNT(DISTINCT rd.deviceHash) FROM RequestData rd WHERE rd.shortUrl.id = :shortUrlId")
+    long countDistinctDeviceHashes(@Param("shortUrlId") UUID shortUrlId);
 
     @Query("""
                 SELECT

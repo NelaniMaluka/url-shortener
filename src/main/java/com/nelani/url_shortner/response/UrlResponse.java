@@ -2,6 +2,7 @@ package com.nelani.url_shortner.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -22,5 +23,7 @@ public record UrlResponse(
 
                 @Schema(description = "Timestamp when the URL will expire", example = "2025-12-06T14:50:00") LocalDateTime expiresAt,
 
-                @Schema(description = "Number of times the short URL has been accessed", example = "42") long clicks) {
+                @Schema(description = "Number of times the short URL has been accessed", example = "42") Long clicks,
+
+                @Schema(description = "Maximum number of unique devices allowed to access the short URL.", example = "5") Long accessLimit) {
 }

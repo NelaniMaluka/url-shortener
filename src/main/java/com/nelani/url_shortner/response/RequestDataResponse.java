@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Schema(description = "Represents request data for a shortened URL access.")
 public record RequestDataResponse(
                 @Schema(description = "The shortened URL that was accessed", example = "http://localhost:8080/a8f3Ks") String shortUrl,
-                @Schema(description = "IP address of the requester", example = "192.168.1.1") String ipAddress,
+                @Schema(description = "Hashed identifier of the requester’s device (SHA-256 of IP, user agent, and short URL ID). Falls back to a random UUID if hashing fails.", example = "3a5f1b2c4d6e7f890123456789abcdef0123456789abcdef0123456789abcdef") String hashedDevice,
                 @Schema(description = "Country of the requester", example = "United States") String country,
                 @Schema(description = "City of the requester", example = "New York") String city,
                 @Schema(description = "Referrer URL", example = "https://www.google.com") String referrer,

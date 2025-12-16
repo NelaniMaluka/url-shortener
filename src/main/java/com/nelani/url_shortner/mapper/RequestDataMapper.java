@@ -10,7 +10,7 @@ public class RequestDataMapper {
 
     public static RequestDataResponse toRequestDataDto(RequestData requestData) {
         return new RequestDataResponse(UrlShortenerAlgorithm.buildUrl(requestData.getShortUrl().getShortCode()),
-                requestData.getIpAddress(), requestData.getCountry(), requestData.getCity(), requestData.getReferrer(),
+                requestData.getDeviceHash(), requestData.getCountry(), requestData.getCity(), requestData.getReferrer(),
                 requestData.getUserAgent(), requestData.getTimestamp());
     }
 

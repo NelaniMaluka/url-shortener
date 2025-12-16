@@ -14,15 +14,20 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "short_url", indexes = {
+        @Index(name = "idx_shortcode", columnList = "shortCode"),
+        @Index(name = "idx_originalurl", columnList = "originalUrl"),
+        @Index(name = "idx_expiresat", columnList = "expiresAt")
+})
 public class ShortUrl {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(length = 8, nullable = false, unique = true)
+    @Column(length = 12, nullable = false, unique = true)
     @NotBlank(message = "Short code cannot be null or blank")
-    @Size(min = 8, max = 8, message = "Short code must be 8 characters long")
+    @Size(min = 2, max = 12, message = "Short code must be between 2 and 12 characters")
     private String shortCode;
 
     @Lob
@@ -40,6 +45,9 @@ public class ShortUrl {
 
     @Column(nullable = true)
     private LocalDateTime expiresAt;
+
+    @Column(name = "access_limit", nullable = true)
+    private Long accessLimit;
 
     @PreUpdate
     public void onUpdate() {
