@@ -6,8 +6,10 @@ import com.nelani.url_shortner.model.ShortUrl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -27,5 +29,10 @@ public interface RequestDataRepository extends JpaRepository<RequestData, UUID> 
                 ORDER BY COUNT(rd.id) DESC
             """)
     Page<UrlAccessStats> findMostAccessedUrls(Pageable pageable);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM RequestData rd WHERE rd.shortUrl = :shortUrl")
+    int deleteByShortUrl(@Param("shortUrl") ShortUrl shortUrl);
 
 }

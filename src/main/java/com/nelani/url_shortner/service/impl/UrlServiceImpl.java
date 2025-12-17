@@ -4,6 +4,8 @@ import com.nelani.url_shortner.dto.CreateUrlDTO;
 import com.nelani.url_shortner.dto.UpdateUrlDTO;
 import com.nelani.url_shortner.mapper.UrlResponseMapper;
 import com.nelani.url_shortner.model.ShortUrl;
+import com.nelani.url_shortner.model.ShortUrlSortField;
+import com.nelani.url_shortner.model.SortDirection;
 import com.nelani.url_shortner.repository.RequestDataRepository;
 import com.nelani.url_shortner.repository.ShortUrlRepository;
 import com.nelani.url_shortner.response.UrlResponse;
@@ -11,6 +13,7 @@ import com.nelani.url_shortner.service.UrlService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,9 +34,17 @@ public class UrlServiceImpl implements UrlService {
 
     @Override
     @Transactional
-    public Page<UrlResponse> viewAllUrls(int page, int size) {
+    public Page<UrlResponse> viewAllUrls(int page, int size, ShortUrlSortField sortField,
+            SortDirection direction) {
+
+        Sort sort = Sort.by(
+                direction == SortDirection.ASC
+                        ? Sort.Direction.ASC
+                        : Sort.Direction.DESC,
+                sortField.getField());
+
         // Generate and get the urls
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, sort);
         var urls = urlRepository.findAll(pageable);
 
         // Return the page with urls mapped to the dto
@@ -123,7 +134,7 @@ public class UrlServiceImpl implements UrlService {
     @Override
     @Transactional
     public void deleteUrl(String existingUrl) {
-        // validate url
+        // Validate url
         existingUrl = UrlShortenerAlgorithm.validateUrl(existingUrl);
 
         // Gets the shortCode from the url
@@ -133,7 +144,8 @@ public class UrlServiceImpl implements UrlService {
         ShortUrl shortUrl = urlRepository.findByShortCode(shortCode)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Short url does not exist."));
 
-        // deletes the url from the database
+        // Deletes the url from the database
+        requestDataRepository.deleteByShortUrl(shortUrl);
         urlRepository.delete(shortUrl);
     }
 

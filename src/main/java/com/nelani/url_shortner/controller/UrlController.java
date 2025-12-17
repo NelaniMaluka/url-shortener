@@ -2,6 +2,8 @@ package com.nelani.url_shortner.controller;
 
 import com.nelani.url_shortner.dto.CreateUrlDTO;
 import com.nelani.url_shortner.dto.UpdateUrlDTO;
+import com.nelani.url_shortner.model.ShortUrlSortField;
+import com.nelani.url_shortner.model.SortDirection;
 import com.nelani.url_shortner.response.BulkUrlResult;
 import com.nelani.url_shortner.response.UrlResponse;
 import com.nelani.url_shortner.service.UrlService;
@@ -36,8 +38,11 @@ public class UrlController {
         public ResponseEntity<?> viewAllUrls(
                         @Parameter(description = "Page number") @RequestParam(defaultValue = "0") int page,
 
-                        @Parameter(description = "Number of items per page") @RequestParam(defaultValue = "10") int size) {
-                var urls = urlService.viewAllUrls(page, size);
+                        @Parameter(description = "Number of items per page") @RequestParam(defaultValue = "10") int size,
+                        @Parameter(description = "Sort field: CREATED_AT, EXPIRES_AT, ACCESS_LIMIT") @RequestParam(defaultValue = "CREATED_AT") ShortUrlSortField sortBy,
+
+                        @Parameter(description = "Sort direction: ASC or DESC") @RequestParam(defaultValue = "DESC") SortDirection direction) {
+                var urls = urlService.viewAllUrls(page, size, sortBy, direction);
                 return ResponseEntity.ok(urls);
         }
 
