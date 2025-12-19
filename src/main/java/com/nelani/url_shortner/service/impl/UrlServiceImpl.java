@@ -33,7 +33,7 @@ public class UrlServiceImpl implements UrlService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Page<UrlResponse> viewAllUrls(int page, int size, ShortUrlSortField sortField,
             SortDirection direction) {
 

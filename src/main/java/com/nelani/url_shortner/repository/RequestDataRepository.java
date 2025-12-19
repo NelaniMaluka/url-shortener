@@ -21,18 +21,65 @@ public interface RequestDataRepository extends JpaRepository<RequestData, UUID> 
     long countDistinctDeviceHashes(@Param("shortUrlId") UUID shortUrlId);
 
     @Query("""
-                SELECT
-                    rd.shortUrl.shortCode AS shortCode,
-                    COUNT(rd.id) AS accessCount
+                SELECT rd.shortUrl.shortCode AS value,
+                       COUNT(rd.id) AS accessCount,
+                       COUNT(DISTINCT rd.deviceHash) AS deviceCount
                 FROM RequestData rd
                 GROUP BY rd.shortUrl.shortCode
-                ORDER BY COUNT(rd.id) DESC
             """)
-    Page<UrlAccessStats> findMostAccessedUrls(Pageable pageable);
+    Page<UrlAccessStats> mostAccessedUrls(Pageable pageable);
+
+    @Query("""
+                SELECT rd.country AS value,
+                       COUNT(rd.id) AS accessCount,
+                       COUNT(DISTINCT rd.deviceHash) AS deviceCount
+                FROM RequestData rd
+                WHERE rd.country IS NOT NULL
+                GROUP BY rd.country
+            """)
+    Page<UrlAccessStats> mostAccessedCountries(Pageable pageable);
+
+    @Query("""
+                SELECT rd.city AS value,
+                       COUNT(rd.id) AS accessCount,
+                       COUNT(DISTINCT rd.deviceHash) AS deviceCount
+                FROM RequestData rd
+                WHERE rd.city IS NOT NULL
+                GROUP BY rd.city
+            """)
+    Page<UrlAccessStats> mostAccessedCities(Pageable pageable);
+
+    @Query("""
+                SELECT rd.referrer AS value,
+                       COUNT(rd.id) AS accessCount,
+                       COUNT(DISTINCT rd.deviceHash) AS deviceCount
+                FROM RequestData rd
+                WHERE rd.referrer IS NOT NULL
+                GROUP BY rd.referrer
+            """)
+    Page<UrlAccessStats> mostAccessedReferrers(Pageable pageable);
+
+    @Query("""
+                SELECT rd.userAgent AS value,
+                       COUNT(rd.id) AS accessCount,
+                       COUNT(DISTINCT rd.deviceHash) AS deviceCount
+                FROM RequestData rd
+                WHERE rd.userAgent IS NOT NULL
+                GROUP BY rd.userAgent
+            """)
+    Page<UrlAccessStats> mostAccessedUserAgents(Pageable pageable);
+
+    @Query("""
+                SELECT FUNCTION('DATE', rd.timestamp) AS value,
+                       COUNT(rd.id) AS accessCount,
+                       COUNT(DISTINCT rd.deviceHash) AS deviceCount
+                FROM RequestData rd
+                GROUP BY FUNCTION('DATE', rd.timestamp)
+            """)
+    Page<UrlAccessStats> accessStatsByDay(Pageable pageable);
 
     @Modifying
     @Transactional
     @Query("DELETE FROM RequestData rd WHERE rd.shortUrl = :shortUrl")
     int deleteByShortUrl(@Param("shortUrl") ShortUrl shortUrl);
-
 }

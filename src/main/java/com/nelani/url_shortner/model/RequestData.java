@@ -16,7 +16,12 @@ import java.util.UUID;
 @Table(name = "request_data", indexes = {
                 @Index(name = "idx_shorturl_id", columnList = "short_url_id"),
                 @Index(name = "idx_device_hash", columnList = "deviceHash"),
-                @Index(name = "idx_shorturl_devicehash", columnList = "short_url_id, deviceHash")
+                @Index(name = "idx_shorturl_devicehash", columnList = "short_url_id, deviceHash"),
+                @Index(name = "idx_country", columnList = "country"),
+                @Index(name = "idx_city", columnList = "city"),
+                @Index(name = "idx_referrer", columnList = "referrer"),
+                @Index(name = "idx_user_agent", columnList = "userAgent"),
+                @Index(name = "idx_timestamp", columnList = "timestamp")
 })
 public class RequestData {
 

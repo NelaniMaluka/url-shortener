@@ -55,13 +55,13 @@ public class UrlShortenerAlgorithm {
     }
 
     public static String buildUrl(String shortCode) {
-        String fullUrl = HOSTURL + "/" + shortCode;
+        String fullUrl = HOSTURL + "/r/" + shortCode;
         log.info("Short URL built successfully");
         return fullUrl;
     }
 
     public static String decode(String url) {
-        String shortCode = url.replace(HOSTURL + "/", "");
+        String shortCode = url.replace(HOSTURL + "/r/", "");
         log.info("Short code decoded from URL");
         return shortCode;
     }

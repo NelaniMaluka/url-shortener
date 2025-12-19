@@ -1,12 +1,15 @@
 package com.nelani.url_shortner.service.impl;
 
-import com.nelani.url_shortner.mapper.RequestDataMapper;
+import com.nelani.url_shortner.dto.UrlAccessStats;
+import com.nelani.url_shortner.dto.UrlAccessStatsDTO;
+import com.nelani.url_shortner.model.SortDirection;
+import com.nelani.url_shortner.model.StatsGroupBy;
 import com.nelani.url_shortner.repository.RequestDataRepository;
-import com.nelani.url_shortner.response.MostAccessedUrlResponse;
 import com.nelani.url_shortner.service.RequestDataService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,13 +23,38 @@ public class RequestDataServiceImpl implements RequestDataService {
     }
 
     @Override
-    @Transactional
-    public Page<MostAccessedUrlResponse> getMostAccessedRequestData(int page, int size) {
-        // Get the most accessed urls
-        Pageable pageable = PageRequest.of(page, size);
-        var requestDataPage = requestDataRepository.findMostAccessedUrls(pageable);
+    @Transactional(readOnly = true)
+    public Page<UrlAccessStats> getTopStats(
+            StatsGroupBy groupBy,
+            int page, int size, SortDirection direction) {
 
-        // Return the page with urls mapped to the dto
-        return requestDataPage.map(RequestDataMapper::toMostAccessedUrlDto);
+        // Build dynamic sorting based on access count alias exposed by projections
+        Sort sort = Sort.by(
+                direction == SortDirection.ASC ? Sort.Direction.ASC : Sort.Direction.DESC,
+                "accessCount");
+
+        // Create pageable request with sorting applied
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        // Delegate aggregation logic to repository layer based on grouping dimension
+        Page<UrlAccessStats> data = switch (groupBy) {
+            case URL -> requestDataRepository.mostAccessedUrls(pageable);
+            case COUNTRY -> requestDataRepository.mostAccessedCountries(pageable);
+            case CITY -> requestDataRepository.mostAccessedCities(pageable);
+            case REFERRER -> requestDataRepository.mostAccessedReferrers(pageable);
+            case USER_AGENT -> requestDataRepository.mostAccessedUserAgents(pageable);
+            default -> requestDataRepository.accessStatsByDay(pageable);
+        };
+
+        // Only manipulate value to generate the url
+        if (groupBy == StatsGroupBy.URL) {
+            return data.map(stats -> {
+                String modifiedValue = UrlShortenerAlgorithm.buildUrl(stats.getValue());
+                return new UrlAccessStatsDTO(modifiedValue, stats.getAccessCount(), stats.getDeviceCount());
+            });
+        }
+
+        return data;
     }
+
 }
