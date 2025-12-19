@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/r")
 public class RedirectionController {
 
         private final RedirectionService redirectionService;
@@ -21,7 +21,7 @@ public class RedirectionController {
 
         @Operation(summary = "Redirect short URL to original URL", description = "Takes the short code and performs an HTTP 302 redirect to the corresponding long URL.")
         @ApiResponse(responseCode = "302", description = "Redirect to the original URL")
-        @GetMapping("{shortCode}")
+        @GetMapping("/{shortCode}")
         @RateLimiter(name = "redirectRateLimiter")
         public ResponseEntity<Void> redirect(
                         @Parameter(description = "The short code generated for the long URL", example = "a8f3Ks") @PathVariable String shortCode,

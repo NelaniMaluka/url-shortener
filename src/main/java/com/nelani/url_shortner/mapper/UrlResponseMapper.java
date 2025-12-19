@@ -9,7 +9,6 @@ public class UrlResponseMapper {
 
     public static UrlResponse toDto(ShortUrl shortUrl, Long clicks) {
         return new UrlResponse(
-                shortUrl.getId(),
                 shortUrl.getOriginalUrl(),
                 UrlShortenerAlgorithm.buildUrl(shortUrl.getShortCode()),
                 shortUrl.getCreatedAt(),

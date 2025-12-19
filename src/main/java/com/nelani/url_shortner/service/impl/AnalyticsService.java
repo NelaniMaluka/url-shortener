@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
@@ -34,8 +35,8 @@ public class AnalyticsService {
      * is not affected. Analytics is best-effort and should never
      * block the user request flow.
      */
-    @Async
-    @Transactional
+    @Async("analyticsExecutor")
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void logRequestAsync(ShortUrl shortUrl, HttpServletRequest req) {
         String ip = getClientIp(req);
         String deviceHash = generateDeviceHash(ip, req.getHeader("User-Agent"), shortUrl.getId());
@@ -90,7 +91,7 @@ public class AnalyticsService {
 
         } catch (NoSuchAlgorithmException e) {
             // Fallback: log the error and generate a random UUID
-            System.err.println("Warning: Could not generate device hash, using fallback UUID. " + e.getMessage());
+            log.error("Warning: Could not generate device hash, using fallback UUID. " + e.getMessage());
             return UUID.randomUUID().toString().replace("-", "");
         }
     }
