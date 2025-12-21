@@ -104,16 +104,19 @@ public class UrlServiceImpl implements UrlService {
         // Checks if the new url exists
         boolean exists = urlRepository.existsByOriginalUrl(newUrl);
         if (exists) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Url already exists.");
+            ShortUrl existingShortUrl = urlRepository.findByShortCode(shortCode)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Short url does not exist."));
+
+            if (existingShortUrl.getId() != shortUrl.getId()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Url already exists.");
+            }
         }
 
         // Check if the new short code exists
-        if (dto.newShortKey() != null && !urlRepository.existsByShortCode(dto.newShortKey())) {
+        if (dto.newShortKey() != null && urlRepository.existsByShortCode(dto.newShortKey())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Short Key is already in use.");
-        }
-
-        // Set the new short code if it's not null
-        if (dto.newShortKey() != null) {
+        } else {
+            // Set the new short code if it's not null
             shortUrl.setShortCode(dto.newShortKey());
         }
 

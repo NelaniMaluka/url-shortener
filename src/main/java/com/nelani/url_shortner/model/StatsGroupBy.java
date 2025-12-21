@@ -4,7 +4,5 @@ public enum StatsGroupBy {
     URL,
     COUNTRY,
     CITY,
-    REFERRER,
-    USER_AGENT,
-    TIMESTAMP
+    USER_AGENT
 }

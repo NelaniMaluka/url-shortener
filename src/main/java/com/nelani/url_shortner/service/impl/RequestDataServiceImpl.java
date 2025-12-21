@@ -41,9 +41,7 @@ public class RequestDataServiceImpl implements RequestDataService {
             case URL -> requestDataRepository.mostAccessedUrls(pageable);
             case COUNTRY -> requestDataRepository.mostAccessedCountries(pageable);
             case CITY -> requestDataRepository.mostAccessedCities(pageable);
-            case REFERRER -> requestDataRepository.mostAccessedReferrers(pageable);
             case USER_AGENT -> requestDataRepository.mostAccessedUserAgents(pageable);
-            default -> requestDataRepository.accessStatsByDay(pageable);
         };
 
         // Only manipulate value to generate the url

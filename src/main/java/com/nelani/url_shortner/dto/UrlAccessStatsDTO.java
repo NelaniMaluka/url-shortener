@@ -3,8 +3,8 @@ package com.nelani.url_shortner.dto;
 public class UrlAccessStatsDTO implements UrlAccessStats {
 
     private String value;
-    private long accessCount;
-    private long deviceCount;
+    private final long accessCount;
+    private final long deviceCount;
 
     public UrlAccessStatsDTO(String value, long accessCount, long deviceCount) {
         this.value = value;
