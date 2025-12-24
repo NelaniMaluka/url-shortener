@@ -42,7 +42,7 @@ public class UrlShortenerAlgorithmTest {
     @Test
     public void UrlShortenerAlgorithmTest_Encode_ThrowsSelfReferenceError() {
         // Arrange
-        String selfReferenceUrl = "http://localhost:8080/r/abc123";
+        String selfReferenceUrl = "https://url-shortener-4yxt.onrender.com/r/abc123";
 
         // Assert
         assertThatThrownBy(() -> UrlShortenerAlgorithm.encode(selfReferenceUrl))
