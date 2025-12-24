@@ -38,8 +38,8 @@ public class AnalyticsService {
     @Async("analyticsExecutor")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void logRequestAsync(ShortUrl shortUrl, HttpServletRequest req) {
-        String ip = getClientIp(req);
-        String deviceHash = generateDeviceHash(ip, req.getHeader("User-Agent"), shortUrl.getId());
+        final String ip = getClientIp(req);
+        final String deviceHash = generateDeviceHash(ip, req.getHeader("User-Agent"), shortUrl.getId());
 
         RequestData data = RequestData.builder()
                 .shortUrl(shortUrl)
@@ -78,7 +78,7 @@ public class AnalyticsService {
 
     private String generateDeviceHash(String ip, String userAgent, UUID shortUrlId) {
         try {
-            String raw = ip + "|" + userAgent + "|" + shortUrlId;
+            final String raw = ip + "|" + userAgent + "|" + shortUrlId;
 
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(raw.getBytes(StandardCharsets.UTF_8));

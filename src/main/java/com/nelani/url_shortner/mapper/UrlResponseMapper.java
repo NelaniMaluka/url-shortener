@@ -20,7 +20,7 @@ public class UrlResponseMapper {
 
     // Overloaded method for mapping without clicks
     public static UrlResponse toDto(ShortUrl shortUrl, RequestDataRepository requestDataRepository) {
-        long clicks = requestDataRepository.countByShortUrl(shortUrl);
+        final long clicks = requestDataRepository.countByShortUrl(shortUrl);
         return toDto(shortUrl, clicks);
     }
 

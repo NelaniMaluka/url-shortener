@@ -31,7 +31,7 @@ public class GeoLookupServiceImpl implements GeoLookupService {
     @Override
     public GeoInfo lookup(String ipAddress) {
         try {
-            String url = "http://ip-api.com/json/" + ipAddress + "?fields=status,country,city";
+            final String url = "http://ip-api.com/json/" + ipAddress + "?fields=status,country,city";
 
             Map<String, Object> response = restTemplate.getForObject(url, Map.class);
 
@@ -44,8 +44,8 @@ public class GeoLookupServiceImpl implements GeoLookupService {
                 return new GeoInfo("Unknown", "Unknown");
             }
 
-            String country = (String) response.getOrDefault("country", "Unknown");
-            String city = (String) response.getOrDefault("city", "Unknown");
+            final String country = (String) response.getOrDefault("country", "Unknown");
+            final String city = (String) response.getOrDefault("city", "Unknown");
 
             return new GeoInfo(country, city);
 

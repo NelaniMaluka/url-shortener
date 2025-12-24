@@ -50,19 +50,19 @@ public class UrlShortenerAlgorithm {
             sb.append(BASE62.charAt(RANDOM.nextInt(BASE62.length())));
         }
 
-        String shortCode = sb.toString();
+        final String shortCode = sb.toString();
         log.info("Short code generated: {}", shortCode);
         return shortCode;
     }
 
     public static String buildUrl(String shortCode) {
-        String fullUrl = HOSTURL + "/r/" + shortCode;
+        final String fullUrl = HOSTURL + "/r/" + shortCode;
         log.info("Short URL built successfully");
         return fullUrl;
     }
 
     public static String decode(String url) {
-        String shortCode = url.replace(HOSTURL + "/r/", "");
+        final String shortCode = url.replace(HOSTURL + "/r/", "");
         log.info("Short code decoded from URL");
         return shortCode;
     }

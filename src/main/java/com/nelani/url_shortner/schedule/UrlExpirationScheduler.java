@@ -22,11 +22,11 @@ public class UrlExpirationScheduler {
     @Scheduled(cron = "0 0 3 * * ?")
     @Transactional
     public void deleteExpiredUrls() {
-        LocalDateTime cutoffDate = LocalDateTime.now().minusDays(30);
+        final LocalDateTime cutoffDate = LocalDateTime.now().minusDays(30);
         log.info("Starting expired URL cleanup. Expired before: {}", cutoffDate);
 
         var expiredUrls = shortUrlRepository.findUrlsExpiredBefore(cutoffDate);
-        int count = expiredUrls.size();
+        final int count = expiredUrls.size();
 
         if (count == 0) {
             log.info("No expired URLs found for cleanup.");
