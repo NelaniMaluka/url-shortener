@@ -18,6 +18,7 @@ public class UrlShortenerAlgorithm {
     public static String encode(String url) {
         log.info("Encoding URL for shortening");
 
+        url = validateUrl(url);
         URI uri;
         try {
             uri = new URI(url);

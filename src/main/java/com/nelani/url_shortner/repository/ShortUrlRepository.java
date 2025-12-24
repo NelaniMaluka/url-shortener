@@ -15,21 +15,23 @@ import java.util.UUID;
 
 @Repository
 public interface ShortUrlRepository extends JpaRepository<ShortUrl, UUID> {
-    @Override
-    Page<ShortUrl> findAll(Pageable pageable);
+  @Override
+  Page<ShortUrl> findAll(Pageable pageable);
 
-    Optional<ShortUrl> findByShortCode(String shortCode);
+  Optional<ShortUrl> findByShortCode(String shortCode);
 
-    boolean existsByShortCode(String shortCode);
+  Optional<ShortUrl> findByOriginalUrl(String originalUrl);
 
-    boolean existsByOriginalUrl(String originalUrl);
+  boolean existsByShortCode(String shortCode);
 
-    @Query("""
-                SELECT su
-                FROM ShortUrl su
-                WHERE su.expiresAt IS NOT NULL
-                  AND su.expiresAt <= :expiryDate
-            """)
-    List<ShortUrl> findUrlsExpiredBefore(@Param("expiryDate") LocalDateTime expiryDate);
+  boolean existsByOriginalUrl(String originalUrl);
+
+  @Query("""
+          SELECT su
+          FROM ShortUrl su
+          WHERE su.expiresAt IS NOT NULL
+            AND su.expiresAt <= :expiryDate
+      """)
+  List<ShortUrl> findUrlsExpiredBefore(@Param("expiryDate") LocalDateTime expiryDate);
 
 }

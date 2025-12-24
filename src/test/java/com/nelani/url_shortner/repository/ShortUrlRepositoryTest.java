@@ -72,6 +72,22 @@ public class ShortUrlRepositoryTest {
     }
 
     @Test
+    public void ShortUrlRepositoryTest_FindByOriginalUrl_ReturnsOptionalShortUrl() {
+        // Act
+        shortUrlRepository.save(shortUrl);
+
+        // Assert
+        var result = shortUrlRepository.findByOriginalUrl(shortUrl.getOriginalUrl());
+        Assertions.assertThat(result).isPresent();
+
+        ShortUrl url = result.get();
+        Assertions.assertThat(url.getId()).isEqualTo(shortUrl.getId());
+        Assertions.assertThat(url.getShortCode()).isEqualTo(shortUrl.getShortCode());
+        Assertions.assertThat(url.getOriginalUrl()).isEqualTo(shortUrl.getOriginalUrl());
+        Assertions.assertThat(url.getAccessLimit()).isEqualTo(shortUrl.getAccessLimit());
+    }
+
+    @Test
     public void ShortUrlRepositoryTest_existsByShortCode_ReturnsTrue() {
         // Act
         shortUrlRepository.save(shortUrl);

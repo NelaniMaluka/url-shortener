@@ -54,11 +54,8 @@ public class UrlServiceImpl implements UrlService {
     @Override
     @Transactional
     public UrlResponse createShortUrl(CreateUrlDTO dto) {
-        // validate url
-        String url = UrlShortenerAlgorithm.validateUrl(dto.url());
-
         // Check if the url exists
-        boolean exists = urlRepository.existsByOriginalUrl(url);
+        boolean exists = urlRepository.existsByOriginalUrl(dto.url());
         if (exists) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Url already exists.");
         }
@@ -66,13 +63,13 @@ public class UrlServiceImpl implements UrlService {
         // Generate a shortCode for the new url
         String shortCode;
         do {
-            shortCode = UrlShortenerAlgorithm.encode(url);
+            shortCode = UrlShortenerAlgorithm.encode(dto.url());
         } while (urlRepository.existsByShortCode(shortCode));
 
         // Create and save the new url
         ShortUrl shortUrl = ShortUrl.builder()
                 .shortCode(shortCode)
-                .originalUrl(url)
+                .originalUrl(dto.url())
                 .accessLimit(dto.accessLimit())
                 .build();
 
@@ -104,8 +101,8 @@ public class UrlServiceImpl implements UrlService {
         // Checks if the new url exists
         boolean exists = urlRepository.existsByOriginalUrl(newUrl);
         if (exists) {
-            ShortUrl existingShortUrl = urlRepository.findByShortCode(shortCode)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Short url does not exist."));
+            ShortUrl existingShortUrl = urlRepository.findByOriginalUrl(newUrl)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Existing url not found."));
 
             if (existingShortUrl.getId() != shortUrl.getId()) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Url already exists.");

@@ -7,6 +7,8 @@ import com.nelani.url_shortner.service.RequestDataService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -32,9 +34,9 @@ public class RequestDataController {
     public ResponseEntity<Page<UrlAccessStats>> stats(
             @Parameter(description = "Group statistics by this dimension", example = "COUNTRY") @RequestParam(defaultValue = "COUNTRY") StatsGroupBy groupBy,
 
-            @Parameter(description = "Page number, zero-based", example = "0") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Page number, zero-based", example = "0") @RequestParam(defaultValue = "0") @Min(0) int page,
 
-            @Parameter(description = "Number of records per page", example = "10") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Number of records per page", example = "10") @RequestParam(defaultValue = "10") @Max(100) int size,
 
             @Parameter(description = "Sort direction: ASC or DESC", example = "DESC") @RequestParam(defaultValue = "DESC") SortDirection direction) {
         return ResponseEntity.ok(requestDataService.getTopStats(groupBy, page, size, direction));

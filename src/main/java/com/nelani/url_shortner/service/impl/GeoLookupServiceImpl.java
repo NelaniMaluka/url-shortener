@@ -12,7 +12,11 @@ import java.util.Map;
 @Service
 public class GeoLookupServiceImpl implements GeoLookupService {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
+
+    public GeoLookupServiceImpl(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     /**
      * Performs a geo IP lookup using a free external API (ip-api.com).

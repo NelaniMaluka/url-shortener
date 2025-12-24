@@ -45,7 +45,7 @@ public class RedirectionServiceImpl implements RedirectionService {
             if (accessedDevices >= shortUrl.getAccessLimit()) {
                 throw new ResponseStatusException(
                         HttpStatus.FORBIDDEN,
-                        "Access denied: this short URL has reached its device limit of " + shortUrl.getAccessLimit());
+                        "This short URL has reached its maximum number of allowed accesses.");
             }
         }
 
