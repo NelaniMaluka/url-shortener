@@ -83,12 +83,13 @@ public class UrlController {
         }
 
         @Operation(summary = "Delete a shortened URL", description = "Deletes a URL mapping from the system.")
-        @ApiResponse(responseCode = "200", description = "URL deleted")
+        @ApiResponse(responseCode = "204", description = "URL deleted")
         @DeleteMapping("/urls/delete")
         @RateLimiter(name = "shortenRateLimiter")
-        public ResponseEntity<?> removeUrl(
+        public ResponseEntity<Void> removeUrl(
                         @Parameter(description = "URL to delete") @RequestBody String url) {
                 urlService.deleteUrl(url);
-                return ResponseEntity.ok("Deleted successfully");
+                return ResponseEntity.noContent().build();
         }
+
 }
