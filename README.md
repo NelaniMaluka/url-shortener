@@ -3,7 +3,6 @@
 A production-ready, high-performance URL shortening and analytics service built with **Spring Boot 3**, **Java 21**, and **H2 Database**. This service provides REST APIs to create and manage short URLs, perform HTTP redirects, and collect comprehensive access statistics including geographic location, referrer, and user agent data. Features built-in **rate limiting**, **scheduled tasks**, and **observability** via **Spring Boot Actuator** and **Prometheus**.
 
 [API Documentation](https://url-shortener-4yxt.onrender.com/swagger-ui/index.html)
----
 
 ## Features
 
