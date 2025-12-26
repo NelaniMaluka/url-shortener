@@ -118,7 +118,7 @@ A production-ready, high-performance URL shortening and analytics service built 
 ### Clone the Repository
 
 ```bash
-git clone <your-repo-url>.git
+git clone https://github.com/NelaniMaluka/url-shortener.git
 cd url-shortner
 ```
 
@@ -321,41 +321,8 @@ mvn test
 
 ---
 
-## Production Hardening Checklist
-
-Before deploying to production, consider:
-
-- **Database**
-  - Switch to a production-ready RDBMS (PostgreSQL, MySQL, etc.) with proper credentials and connection pooling
-- **Profiles**
-  - Use environment-specific property files (e.g., `application-prod.properties`) and set `SPRING_PROFILES_ACTIVE=prod`
-- **Security**
-  - Add authentication/authorization (e.g., Spring Security, API keys, OAuth2)
-  - Restrict access to management endpoints
-- **Logging**
-  - Reduce log level to `INFO` or `WARN` and configure centralized logging (e.g., ELK stack, Splunk)
-- **Rate Limits**
-  - Tune Resilience4j rate limiter configurations based on actual traffic and SLAs
-- **Scaling**
-  - Run behind a reverse proxy/load balancer (Nginx, API Gateway, Kubernetes Ingress, etc.)
-  - Configure resource limits in container runtime (CPU/memory)
-- **Backups & Retention**
-  - Implement retention policies for `RequestData` and `ShortUrl` (via `UrlExpirationScheduler` and/or database jobs)
-
----
-
 ## License
 
 [Add your license here - e.g., MIT, Apache 2.0, etc.]
 
 ---
-
-## Contributing
-
-[Add contribution guidelines if applicable]
-
----
-
-## Contact
-
-[Add contact information or support channels if applicable]
